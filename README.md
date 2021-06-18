@@ -4,7 +4,7 @@
 ```
 docker run -d --name kong \
     -e "KONG_DATABASE=postgres" \
-    -e "KONG_PG_HOST=172.17.0.5" \
+    -e "KONG_PG_HOST=kong-database" \
     -e "KONG_PG_USER=kong" \
     -e "KONG_PG_PASSWORD=kong" \
     -e "KONG_PG_DATABASE=kong" \
@@ -17,10 +17,15 @@ docker run -d --name kong \
     -p 8443:8443 \
     -p 8001:8001 \
     -p 8444:8444 \
-    kong
+    kong kong migrations bootstrap
 
 
-docker run --name postgres -e POSTGRES_PASSWORD=mysecretpassword -e POSTGRES_USER=kong -e POSTGRES_DB=kong -d postgres    
+docker run -d --name kong-database \
+                -p 5432:5432 \
+                -e "POSTGRES_USER=kong" \
+                -e "POSTGRES_DB=kong" \
+                -e "POSTGRES_PASSWORD=kong" \
+                postgres:9.6    
 ```
 # Step1 B. Run the container for Konga Dashboard
 ```
