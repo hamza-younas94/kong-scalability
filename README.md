@@ -17,7 +17,9 @@ docker run -d --name kong \
     -p 8443:8443 \
     -p 8001:8001 \
     -p 8444:8444 \
-    kong kong migrations bootstrap
+    kong 
+
+    // kong migrations bootstrap
 
 
 docker run -d --name kong-database \
@@ -29,10 +31,7 @@ docker run -d --name kong-database \
 ```
 # Step1 B. Run the container for Konga Dashboard
 ```
-docker run -p 1337:1337 \                                                                                                                                                                      
-                 --name konga \
-                 -e "TOKEN_SECRET=somerandomstring" \
-                 pantsel/konga
+docker run -d -p 1337:1337 --name konga -e "TOKEN_SECRET=somerandomstring" pantsel/konga
 ```
 
 # Step2 Run the MySql Container
@@ -44,12 +43,17 @@ docker run --name mysql -e MYSQL_ROOT_PASSWORD=123456 -d mysql:5.7
 ```
 docker build -t microservice_crud:01 . 
 docker run --name crud -e DB_CONNECTION=mysql -e DB_HOST=172.17.0.2 -e DB_PORT=3306 -e DB_DATABASE=crud -e DB_USERNAME=root -e DB_PASSWORD=123456 -v=$(pwd):/var/www -d microservice_crud:01
+
+
+docker exec -it crud php artisan migrate
 ```
 
 # Step4 Make a login build and run it
 ```
 docker build -t microservice_login:01 .
 docker run --name login -e DB_CONNECTION=mysql -e DB_HOST=172.17.0.2 -e DB_PORT=3306 -e DB_DATABASE=login -e DB_USERNAME=root -e DB_PASSWORD=123456 -d -v=$(pwd):/var/www microservice_login:01
+
+docker exec -it login php artisan migrate
 ```
 
 
