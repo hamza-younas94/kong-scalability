@@ -20,7 +20,7 @@ docker run -d --name kong \
     kong
 
 
-docker run --name postgres -e POSTGRES_PASSWORD=mysecretpassword -e POSTGRES_USER=kong -e POSTGRES_DB=kong -d POSTGRES_PASSWORD    
+docker run --name postgres -e POSTGRES_PASSWORD=mysecretpassword -e POSTGRES_USER=kong -e POSTGRES_DB=kong -d postgres    
 ```
 # Step1 B. Run the container for Konga Dashboard
 ```
