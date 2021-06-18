@@ -1,0 +1,113 @@
+FROM php:7.3-fpm
+
+ARG DB_CONNECTION=
+ENV DB_CONNECTION=${DB_CONNECTION}
+ARG DB_HOST=
+ENV DB_HOST=${DB_HOST}
+ARG DB_PORT=
+ENV DB_PORT=${DB_PORT}
+ARG DB_DATABASE=
+ENV DB_DATABASE=${DB_DATABASE}
+ARG DB_USERNAME=
+ENV DB_USERNAME=${DB_USERNAME}
+ARG DB_PASSWORD=
+ENV DB_PASSWORD=${DB_PASSWORD}
+
+# Copy composer.lock and composer.json
+COPY composer.json /var/www/
+
+COPY docker-entry.sh /
+RUN chmod +x /docker-entry.sh
+
+# Set working directory
+WORKDIR /var/www
+
+ARG VUE_APP_GOOGLE_MAP_API=
+ENV VUE_APP_GOOGLE_MAP_API=${VUE_APP_GOOGLE_MAP_API}
+ARG API_URL=http://dev-koohoo.cap.mikaels.com/api
+ENV API_URL=$API_URL
+
+# Install dependencies
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    libpng-dev \
+    libpq-dev \
+    libjpeg62-turbo-dev \
+    libfreetype6-dev \
+    locales \
+    zip \
+    jpegoptim optipng pngquant gifsicle \
+    vim \
+    unzip \
+    git \
+    curl \
+    nginx \
+    libxml2-dev
+
+RUN apt-get update \
+     && apt-get install -y libzip-dev \
+     && docker-php-ext-install zip
+
+# Clear cache
+RUN apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Install extensions
+
+RUN docker-php-ext-install gd
+RUN docker-php-ext-configure gd --with-gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ --with-png-dir=/usr/include/
+
+RUN docker-php-ext-install soap
+RUN docker-php-ext-install pdo_mysql
+RUN docker-php-ext-install pdo_pgsql
+RUN docker-php-ext-install mbstring
+#RUN docker-php-ext-configure zip --with-libzip
+RUN docker-php-ext-install exif
+RUN docker-php-ext-install pcntl
+
+# Install composer
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+
+# Add user for laravel application
+RUN groupadd -g 1000 www
+RUN useradd -u 1000 -ms /bin/bash -g www www
+
+
+RUN adduser --disabled-password --gecos '' hamza
+# Copy existing application directory
+COPY . /var/www/
+RUN ls /var/www
+RUN chown hamza:www /var/www/storage/logs
+
+COPY ./configuration/nginx/conf.d/ /etc/nginx/conf.d/
+RUN ls /etc/nginx/conf.d
+
+COPY ./configuration/php/local.ini /usr/local/etc/php/conf.d/local.ini
+RUN ls /usr/local/etc/php/conf.d
+RUN cat /usr/local/etc/php/conf.d/local.ini
+
+RUN rm -rf /etc/nginx/sites-enabled
+RUN mkdir -p /etc/nginx/sites-enabled
+
+
+RUN chmod -R 777 /var/www/storage
+RUN composer install
+
+# install node
+RUN curl -sL https://deb.nodesource.com/setup_15.x | bash
+#RUN echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list
+RUN apt-get update && apt-get install -y  nodejs
+
+WORKDIR /var/www/public
+#RUN rm storage
+WORKDIR /var/www/
+RUN php artisan storage:link
+RUN composer require cartalyst/stripe-laravel
+# Expose port 80 and start php-fpm server
+EXPOSE 80
+
+COPY bootstart.sh /
+RUN chmod +x /bootstart.sh
+
+#ENTRYPOINT ["/bootstart.sh"]
+
+CMD ["/docker-entry.sh"]

@@ -1,0 +1,34 @@
+###
+POST http://172.17.0.3/api/login
+Content-Type: application/json
+
+{
+    "email":"hamza.younas@mikaels.com",
+    "password": "123456"
+}
+
+###
+
+POST http://172.17.0.3/api/register
+Accept: application/json
+Content-Type: application/json
+
+{
+    "name": "Hamza Younas",
+    "email":"hamza.younas11@mikaels.com",
+    "password": "123456"
+}
+
+###
+GET http://172.17.0.3/api/user
+Accept: application/json
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOlwvXC8xNzIuMTcuMC4zXC9hcGlcL2xvZ2luIiwiaWF0IjoxNjIyODA2NDIwLCJleHAiOjE2MjI4MTAwMjAsIm5iZiI6MTYyMjgwNjQyMCwianRpIjoiNDFRQndiRnNaQ0xNOUhJaCIsInN1YiI6MSwicHJ2IjoiMjNiZDVjODk0OWY2MDBhZGIzOWU3MDFjNDAwODcyZGI3YTU5NzZmNyJ9.biURbUmlIosnPDWApOdNZtlfBfjunScW0qOymP1a9Ho
+Content-Type: application/json
+
+{
+    "name": "Hamza Younas",
+    "email":"hamza.younas11@mikaels.com",
+    "password": "123456"
+}
+
+###

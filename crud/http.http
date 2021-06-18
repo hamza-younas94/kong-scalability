@@ -1,0 +1,23 @@
+GET http://localhost:8000/yousuf/api/tasks
+Accept: application/json
+
+###
+POST http://172.17.0.4/api/task
+Content-Type: application/json
+
+{
+    "title":"dummy title",
+    "description": "dummy description"
+}
+
+###
+
+PUT http://172.17.0.4/api/complete/2
+Content-Type: application/json
+
+###
+
+DELETE http://172.17.0.4/api/delete/2
+Content-Type: application/json
+
+###
